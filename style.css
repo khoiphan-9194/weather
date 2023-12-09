@@ -1,0 +1,144 @@
+body {
+  font-family: 'Open Sans', sans-serif;
+  font-size: 16px;
+}
+
+textarea {
+  background: transparent;
+  border: none;
+  resize: none;
+  color: #000000;
+  border-left: 1px solid black;
+  padding: 10px;
+}
+
+.description {
+  white-space: pre-wrap;
+}
+
+.time-block {
+  border-radius: 15px;
+}
+
+.row {
+  border-top: 1px solid white;
+}
+
+.hour {
+  background-color: #ffffff;
+  color: #000000;
+  border-top: 1px dashed #000000;
+}
+
+.past {
+  background-color: #d3d3d3;
+  color: white;
+}
+
+.present {
+  background-color: #ff6961;
+  color: white;
+}
+
+.future {
+  background-color: #77dd77;
+  color: white;
+}
+
+.saveBtn {
+  border-left: 1px solid black;
+  border-top-right-radius: 15px;
+  border-bottom-right-radius: 15px;
+  background-color: #06aed5;
+  color: white;
+}
+
+.saveBtn i:hover {
+  font-size: 20px;
+  transition: all 0.3s ease-in-out;
+}
+
+#clear
+{
+  
+  padding: 30px;
+  display: flex;
+  justify-content: center;
+}
+
+#clear button
+{
+  width: 150px;
+  border-radius: 10px;
+}
+
+#clear button:hover
+{
+  font-size: 20px;
+  transition: all 0.3s ease-in-out;
+  background-color: #06aed5;
+  
+}
+
+body
+{
+  background-image: linear-gradient(to right, rgba(17, 93, 135, 0.221), rgb(20, 198, 201));
+}
+
+
+.heading {
+
+  animation-name: rainbow;
+  animation-duration: 6s;
+  animation-iteration-count: infinite;
+}
+
+
+@keyframes rainbow {
+  0%   {color: rgb(159, 82, 0);}
+  25%  {color: yellow;}
+  50%  {color: whitesmoke;}
+  100% {color: rgb(0, 94, 128);}
+}
+
+
+.lead{
+  animation: move 25s infinite linear; /* set the time to what you want of course */
+}
+
+
+
+@keyframes move {
+  from {
+    transform: translate(100%);
+  }
+  to {
+    transform: translate(-100%);
+  }
+}
+
+.box {
+  width: 100px;
+  height: 100px;
+  background: slateblue;
+  padding: 8px;
+  display: grid;
+  place-content: center;
+  color: white;
+  text-align: center;
+  animation: drop-in 2000ms;
+}
+
+@keyframes drop-in {
+  from {
+    transform:
+      rotate(-30deg) translateY(-100%);
+    opacity: 0;
+  }
+  to {
+    transform:
+      rotate(0deg) translateY(0%);
+    opacity: 1;
+  }
+}
+
