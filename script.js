@@ -1,127 +1,107 @@
+const searchButton = document.querySelector(".search-btn");
+const cityInput = document.querySelector(".city-input");
+const currentWeatherData = document.querySelector(".current-weather");
+let currentDate =  dayjs().format('MMM-DD-YYYY');
+const API_KEY ="313e19582894eb8e201b929fa986e291";
+const cityList =[];
 
-
-$(document).ready(function () {
- 
-    var timeDisplayEl = $('#time-display');
-    function displayTime()
+function getWeather(citiName,latitude,longtitude)
+{
+   var time = displayTime();
+  
+    const WEATHER_URL = `https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longtitude}&appid=${API_KEY}`;
+    fetch(WEATHER_URL)
+    .then(function(response)
     {
-    var rightNow = dayjs().format('MMM DD, YYYY [at] hh:mm:ss a');
-    timeDisplayEl.text(rightNow);
-    setInterval(displayTime,1000);
-    }
-    displayTime();
-  
+        return response.json();
+    })
+    .then(function(data){
+      //  console.log(citiName);
+        
+        console.log(data);
+        console.log(data.name);
+        console.log((((data.main.temp- 273.15) * 9/5) + 32).toFixed(0)+"°F");
+        console.log(data.main.humidity);
+        $('.weather-detail h3').text(citiName.toUpperCase()+" ("+currentDate+")");
+        $('.2').text((((data.main.temp- 273.15) * 9/5) + 32).toFixed(0)+"°F");
+        $('.3').text(data.wind.speed);
+        $('.4').text(data.main.humidity);
+        $('img').attr('src',`https://openweathermap.org/img/wn/${data.weather[0].icon}@4x.png`);
+        $('.weather-icon h4').text(data.weather[0].description);
+        
 
 
-   // Assign saveBtn click listener for user input and get row id and save to local storage
-   $(".saveBtn").on("click", function () {
-      var rootEl = $('.time-block');
-      var khoi = $(this).closest(rootEl).children("#hourBlock").text();
-      var heo = $(this).closest(rootEl).children(".description").val();
-      localStorage.setItem(khoi, heo);
-    
-   });
+        /*
+             <div class = 'current-weather'>
+              <section class = "weather-detail">
+                <h3 id="1">London (12/08/2023)</h3>
+                <h4 id="2">Temp: 76.62</h4>
+                <h4 id="3">Wind: 100</h4>
+                <h4 id="4">Humidity: 300</h4>
+              </section>
+              <section class ='weather-icon'>
+                <img src="https://openweathermap.org/img/wn/10d@4x.png" alt="weather-icon">
+                <h4>Sunny</h4>
+              </section>
+          </div>
+           $(this).attr("src", "images/card-front.jpg");
 
-   $("#clear").on("click", function () {
-  
-    var confirm = window.confirm("Are you sure you want to clear all data? "); 
-    if(confirm)
-   {
-      localStorage.clear();
-      window.location.reload();
-   }
-   });
+src should be in quotes:
 
- 
+$('.img1 img').attr('src');
 
 
-   function hourTracker() {
-     // Get current number of hours.
-     var currentHour = dayjs().hour();
-   // $("#i_am_a_href").attr('id').split('_')[1] // will return 'am'
 
-
-    var rootEl = $('.time-block');
-   
-   $(".time-block").each(function () {
-    var blockHour;
-    var khoi = $(this).closest(rootEl).children("#hourBlock").text(); // this will get the text from
-    if(khoi.includes("AM")|| khoi.includes("12PM")){
-     blockHour = parseInt(khoi.replace(/[^0-9]/g, ''));
-    }
-   
-    else
-    {
-      blockHour = (parseInt(khoi.replace(/[^0-9]/g, ''))+12); //
-    }
-//-----------------------------------------------------
-    if (blockHour < currentHour) {
-      $(this).addClass("past");
-    } else if (blockHour === currentHour) {
-      $(this).removeClass("past");
-      $(this).addClass("present");
-    } else {
-      $(this).removeClass("past");
-      $(this).removeClass("present");
-      $(this).addClass("future");
-    }
-  //  console.log("h1 "+ blockHour + " -- h2 "+currentHour);
-   
-   });
-   
-  
-   }
-
-   hourTracker();
- 
-// Create a function to loop over time blocks to retrieve and display data from local storage
-function displayText() {
-  // Loop over time blocks
-  $(".time-block").each(function () {
- 
-    var blockHour = $(this).children('#hourBlock').text();
-  
-    $(this).children(".description").val(localStorage.getItem(blockHour));
-  });
+        */
+    })
 }
-displayText();
-
-});
 
 
 
+function getCitylocation()
+{
+      
+        var cityName = cityInput.value.trim();
+        if(!cityName) return; 
+        const GEO_URL = `http://api.openweathermap.org/geo/1.0/direct?q=${cityName}&limit=1&appid=${API_KEY}`;
 
-/* Just want to see how many classes or ids in the html
-var allClasses = [];
+        fetch(GEO_URL)
+        .then(function(response){
+            return response.json();
+        })
+        .then(function(data)
+        {
+            if(!data.length)
+            return alert (`${cityName} is invalid, please re-check the input`);
+      //  var namecity =data[0].name;
+       // console.log("name: "+namecity);
+            //console.log(data);
+           const {name,lat,lon} =data[0];
+         //    console.log("Name: "+ name);
+         //  console.log("Lat: "+lat);
+         //   console.log("Long: "+lon);
+          //  cityList.push(name);
+           // localStorage.setItem('city',JSON.stringify(cityList));
+           getWeather(cityName,lat,lon);
+        })
+        .catch(()=>
+        {
+            alert("An error occured while fetching the coordinates!");
+        });
 
-var allElements = document.querySelectorAll('*');
+     
 
-for (var i = 0; i < allElements.length; i++) {
-  var classes = allElements[i].className.toString().split(/\s+/);
-  for (var j = 0; j < classes.length; j++) {
-    var cls = classes[j];
-    if (cls && allClasses.indexOf(cls) === -1)
-      allClasses.push(cls);
-  }
 }
-console.log(allClasses);
 
 
+const displayTime = function()
+{
+var rightNow = dayjs().format('MMM DD, YYYY');
+
+//setInterval(displayTime,1000);
+console.log(rightNow);
+}
 
 
+searchButton.addEventListener('click',getCitylocation);
 
-
-
-// Wrap all code that interacts with the DOM in a call to jQuery to ensure that
-// the code isn't run until the browser has finished rendering all the elements
-// in the html.
-
-
-
-
-//$( "li.third-item" ).siblings().css( "background-color", "red" );
-
-
-//$("#currentDay").text(moment().format("MMMM Do YYYY, h:mm:ss a")) 
-//$( "li.third-item" ).siblings().css( "background-color", "red" );
-*/
