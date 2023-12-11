@@ -57,6 +57,41 @@ $('.img1 img').attr('src');
 }
 
 
+function getForecast(lat1,lon1)
+{
+  
+  const FORECAST_URL = `https://api.openweathermap.org/data/2.5/forecast?lat=${lat1}&lon=${lon1}&appid=${API_KEY}`;
+
+  fetch(FORECAST_URL)
+  .then(function(response)
+  {
+      return response.json();
+  })
+  .then(function(data){
+    //  console.log(citiName);
+      const foreCastList =[];
+      //let foreCastDate;
+      let foreCastDataList=[];
+      console.log(data);
+      const fiveDays = data.list.filter(forecast=>
+        {
+        const  foreCastDate = new Date(forecast.dt_txt).getDate();
+         // console.log(foreCastDate);
+          if(!foreCastList.includes(foreCastDate))
+          {
+            return foreCastList.push(foreCastDate);
+          }
+
+        });
+        console.log(fiveDays);
+   
+   
+      
+  })
+}
+
+
+
 
 function getCitylocation()
 {
@@ -82,7 +117,8 @@ function getCitylocation()
          //   console.log("Long: "+lon);
           //  cityList.push(name);
            // localStorage.setItem('city',JSON.stringify(cityList));
-           getWeather(cityName,lat,lon);
+         //  getWeather(cityName,lat,lon);
+           getForecast(lat,lon);
         })
         .catch(()=>
         {
