@@ -4,6 +4,10 @@ const currentWeatherData = document.querySelector(".current-weather");
 let currentDate =  dayjs().format('MMM-DD-YYYY');
 const API_KEY ="313e19582894eb8e201b929fa986e291";
 const cityList =[];
+const weatherCardsDiv = document.querySelector(".weather-cards");
+//<button class="location-btn">Use Current Location</button>
+
+const current_Location = document.querySelector(".location-btn");
 
 function getWeather(citiName,latitude,longtitude)
 {
@@ -18,10 +22,10 @@ function getWeather(citiName,latitude,longtitude)
     .then(function(data){
       //  console.log(citiName);
         
-        console.log(data);
-        console.log(data.name);
-        console.log((((data.main.temp- 273.15) * 9/5) + 32).toFixed(0)+"°F");
-        console.log(data.main.humidity);
+       // console.log(data);
+        //console.log(data.name);
+        //console.log((((data.main.temp- 273.15) * 9/5) + 32).toFixed(0)+"°F");
+        //console.log(data.main.humidity);
         $('.weather-detail h3').text(citiName.toUpperCase()+" ("+currentDate+")");
         $('.2').text((((data.main.temp- 273.15) * 9/5) + 32).toFixed(0)+"°F");
         $('.3').text(data.wind.speed);
@@ -29,30 +33,6 @@ function getWeather(citiName,latitude,longtitude)
         $('img').attr('src',`https://openweathermap.org/img/wn/${data.weather[0].icon}@4x.png`);
         $('.weather-icon h4').text(data.weather[0].description);
         
-
-
-        /*
-             <div class = 'current-weather'>
-              <section class = "weather-detail">
-                <h3 id="1">London (12/08/2023)</h3>
-                <h4 id="2">Temp: 76.62</h4>
-                <h4 id="3">Wind: 100</h4>
-                <h4 id="4">Humidity: 300</h4>
-              </section>
-              <section class ='weather-icon'>
-                <img src="https://openweathermap.org/img/wn/10d@4x.png" alt="weather-icon">
-                <h4>Sunny</h4>
-              </section>
-          </div>
-           $(this).attr("src", "images/card-front.jpg");
-
-src should be in quotes:
-
-$('.img1 img').attr('src');
-
-
-
-        */
     })
 }
 
@@ -68,27 +48,39 @@ function getForecast(lat1,lon1)
       return response.json();
   })
   .then(function(data){
-    //  console.log(citiName);
-      const foreCastList =[];
-      //let foreCastDate;
-      let foreCastDataList=[];
-      console.log(data);
-      const fiveDays = data.list.filter(forecast=>
-        {
-        const  foreCastDate = new Date(forecast.dt_txt).getDate();
-         // console.log(foreCastDate);
-          if(!foreCastList.includes(foreCastDate))
-          {
-            return foreCastList.push(foreCastDate);
-          }
 
-        });
-        console.log(fiveDays);
-   
-   
+    let foreCastDataList=[];
+      console.log(data);
+      const fiveDay_forecast=[];
+       for (let i = 0; i < data.list.length; i++) {
+        //console.log("---"+data.list[i].dt_txt);
+        const  foreCastDate = new Date(data.list[i].dt_txt).getDate();
+
+        if(!fiveDay_forecast.includes(foreCastDate))
+        {
+          fiveDay_forecast.push(foreCastDate); 
+          foreCastDataList.push(data.list[i]);
+        }
+       
+       }
+     
+     
+
+       for (let index = 0; index < fiveDay_forecast.length; index++) {
+       $('.card'+index+' h3').text(foreCastDataList[index].dt_txt.split(" ")[0]);
+       var url_icon = "https://openweathermap.org/img/wn/"+foreCastDataList[index].weather[0].icon+"@2x.png";
+       $('.card'+index+' img').attr('src',url_icon);
+       $(('.card'+index)+ ' .2').text((((foreCastDataList[index].main.temp- 273.15) * 9/5) + 32).toFixed(0)+"°F");
+      $(('.card'+index)+ ' .3').text(foreCastDataList[index].wind.speed);
+      $(('.card'+index)+ ' .4').text(foreCastDataList[index].main.humidity);
+    // console.log(foreCastDataList[index]);
       
+      
+     }
   })
 }
+
+
 
 
 
@@ -115,10 +107,15 @@ function getCitylocation()
          //    console.log("Name: "+ name);
          //  console.log("Lat: "+lat);
          //   console.log("Long: "+lon);
-          //  cityList.push(name);
-           // localStorage.setItem('city',JSON.stringify(cityList));
-         //  getWeather(cityName,lat,lon);
+           cityList.push(name);
+
+       
+        
+          localStorage.setItem('name', JSON.stringify(cityList));
+
+           getWeather(cityName,lat,lon);
            getForecast(lat,lon);
+           getHistory();
         })
         .catch(()=>
         {
@@ -138,6 +135,48 @@ var rightNow = dayjs().format('MMM DD, YYYY');
 console.log(rightNow);
 }
 
+const getUserCoordinates = () => {
+  navigator.geolocation.getCurrentPosition(
+      position => {
+          const { latitude, longitude } = position.coords; // Get coordinates of user location
+          // Get city name from coordinates using reverse geocoding API
+          const API_URL = `https://api.openweathermap.org/geo/1.0/reverse?lat=${latitude}&lon=${longitude}&limit=1&appid=${API_KEY}`;
+          fetch(API_URL).then(response => response.json()).then(data => {
+              const { name } = data[0];
+              getWeather(name,latitude,longitude);
+            getForecast(latitude,longitude);
+          }).catch(() => {
+              alert("An error occurred while fetching the city name!");
+          });
+      },
+      error => { // Show alert if user denied the location permission
+          if (error.code === error.PERMISSION_DENIED) {
+              alert("Geolocation request denied. Please reset location permission to grant access again.");
+          } else {
+              alert("Geolocation request error. Please reset location permission.");
+          }
+      });
+}
+
+
+var contHistEl = $('.cityHist');
+function getHistory() {
+	contHistEl.empty();
+
+	for (let i = 0; i < cityList.length; i++) {
+
+		var rowEl = $('<row>');
+		var btnEl = $('<button>').text(`${cityList[i]}`)
+
+		rowEl.addClass('row histBtnRow');
+		btnEl.addClass('btn btn-outline-secondary histBtn');
+		btnEl.attr('type', 'button');
+
+		contHistEl.prepend(rowEl);
+		rowEl.append(btnEl);
+	
+}
+}
 
 searchButton.addEventListener('click',getCitylocation);
-
+current_Location.addEventListener('click',getUserCoordinates);
