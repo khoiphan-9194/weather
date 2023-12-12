@@ -8,6 +8,7 @@ const weatherCardsDiv = document.querySelector(".weather-cards");
 //<button class="location-btn">Use Current Location</button>
 
 const current_Location = document.querySelector(".location-btn");
+var contHistEl = $('.cityHist');
 
 function getWeather(citiName,latitude,longtitude)
 {
@@ -115,7 +116,35 @@ function getCitylocation()
 
            getWeather(cityName,lat,lon);
            getForecast(lat,lon);
-           getHistory();
+           
+
+
+           contHistEl.empty();
+
+           for (let i = 0; i < cityList.length; i++) {
+         
+             var rowEl = $('<row>');
+             var btnEl = $('<button>').text(`${cityList[i]}`)
+             
+         
+             rowEl.addClass('row histBtnRow');
+             btnEl.addClass('btn btn-outline-secondary histBtn');
+             btnEl.attr('type', 'button');
+         
+             contHistEl.prepend(rowEl);
+             rowEl.append(btnEl);
+             
+            
+             $('.histBtn').on("click", function (event) {
+               event.preventDefault();
+               cityName = $(this).text();
+               console.log(cityName+"-----------");
+         
+             });
+            
+           
+         }
+
         })
         .catch(()=>
         {
@@ -159,7 +188,7 @@ const getUserCoordinates = () => {
 }
 
 
-var contHistEl = $('.cityHist');
+
 function getHistory() {
 	contHistEl.empty();
 
@@ -167,6 +196,7 @@ function getHistory() {
 
 		var rowEl = $('<row>');
 		var btnEl = $('<button>').text(`${cityList[i]}`)
+    
 
 		rowEl.addClass('row histBtnRow');
 		btnEl.addClass('btn btn-outline-secondary histBtn');
@@ -174,6 +204,14 @@ function getHistory() {
 
 		contHistEl.prepend(rowEl);
 		rowEl.append(btnEl);
+    
+   
+    $('.histBtn').on("click", function (event) {
+      event.preventDefault();
+      city = $(this).text();
+
+    });
+   
 	
 }
 }
