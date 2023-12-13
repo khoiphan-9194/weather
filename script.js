@@ -7,6 +7,11 @@ const cityList =[];
 const weatherCardsDiv = document.querySelector(".weather-cards");
 //<button class="location-btn">Use Current Location</button>
 
+const wrapper = document.getElementById('wrapper');
+
+
+
+
 const current_Location = document.querySelector(".location-btn");
 //let contHistEl = document.querySelector('.cityHist');
 
@@ -115,15 +120,34 @@ function getCitylocation()
           longtitude: lon
           }; 
            cityList.push(data_object);
-       
-          localStorage.setItem(name, JSON.stringify(cityList));
 
+   
+
+       
+          localStorage.setItem('city', JSON.stringify(cityList));
+
+
+         // var retrievedObject = localStorage.getItem(name);
+           // CONVERT STRING TO REGULAR JS OBJECT
+          // var parsedObject = JSON.parse(retrievedObject);
+          
+           // ACCESS DATA
+       //    console.log(parsedObject);
+           
+            
+             // getWeather(citiName,parsedObject[0].latitude,parsedObject[0].longtitude);
+             // getForecast(parsedObject[0].latitude,parsedObject[0].longtitude);
+ 
+         
 
            getWeather(cityName,lat,lon);
            getForecast(lat,lon);
-           getHistory(cityName);
+           getHistory();
 
-          
+
+
+
+       
          
 
         })
@@ -135,6 +159,22 @@ function getCitylocation()
      
 
 }
+/*
+ 
+            var retrievedObject = localStorage.getItem(name);
+          
+          // CONVERT STRING TO REGULAR JS OBJECT
+          var parsedObject = JSON.parse(retrievedObject);
+          
+          // ACCESS DATA
+          console.log(parsedObject[0].latitude+" "+parsedObject[0].longtitude);
+          
+           
+            // getWeather(citiName,parsedObject[0].latitude,parsedObject[0].longtitude);
+            // getForecast(parsedObject[0].latitude,parsedObject[0].longtitude);
+       
+          
+*/
 
 
 
@@ -170,46 +210,49 @@ const getUserCoordinates = () => {
 }
 
 
+
+
+
 var contHistEl = $('.cityHist');
-function getHistory(citiName) {
-	//contHistEl.empty();
+function getHistory() {
 
 
+  contHistEl.empty();
+  for (let i = 0; i < cityList.length; i++) {
+   
+		var rowEl = $('<row>');
+		var btnEl = $('<button>').text(`${cityList[i].cityName}`)
 
-    var x = document.createElement("BUTTON");
+		rowEl.addClass('row histBtnRow');
+		btnEl.addClass('btn btn-outline-secondary histBtn');
+    btnEl.attr('id',i);
+		btnEl.attr('type', 'button');
 
-      var t = document.createTextNode(citiName);
-      x.setAttribute("class","histBtn");
-      x.appendChild(t);
-      contHistEl.appendChild(x);
+		contHistEl.prepend(rowEl);
+		rowEl.append(btnEl);
 
-  
-      
+  }
 
-     
-//Allows the buttons to start a search as well
-$('.histBtn').on("click", function (event) {
-  event.preventDefault();
-  
-
-  var retrievedObject = localStorage.getItem(name);
-  
+  var retrievedObject = localStorage.getItem('city');
+          
   // CONVERT STRING TO REGULAR JS OBJECT
   var parsedObject = JSON.parse(retrievedObject);
   
-  // ACCESS DATA
-  console.log();
-  
-   
-     getWeather(cityName,parsedObject[0].latitude,parsedObject[0].longtitude);
-     getForecast(parsedObject[0].latitude,parsedObject[0].longtitude);
-});
-     
-  
-      
-	
 
+  $('.histBtn').on("click", function (event) {
+		event.preventDefault();
+ 
+    console.log($(this).attr('id'));
+    console.log($(this).text());
+
+    getWeather(parsedObject[$(this).attr('id')].cityName,parsedObject[$(this).attr('id')].latitude,parsedObject[$(this).attr('id')].longtitude);
+    getForecast(parsedObject[$(this).attr('id')].latitude,parsedObject[$(this).attr('id')].longtitude);
+
+  
+	});
 }
+
+
 //.cityHist
 /*
 $(":button").on("click", function (event) {
@@ -224,12 +267,12 @@ var parsedObject = JSON.parse(retrievedObject);
 console.log();
 
  
-   getWeather(cityName,parsedObject[0].latitude,parsedObject[0].longtitude);
-   getForecast(parsedObject[0].latitude,parsedObject[0].longtitude);
+   
 
 });
 
 */
+
+
 searchButton.addEventListener('click',getCitylocation);
 current_Location.addEventListener('click',getUserCoordinates);
-
