@@ -8,7 +8,7 @@ const weatherCardsDiv = document.querySelector(".weather-cards");
 //<button class="location-btn">Use Current Location</button>
 
 const current_Location = document.querySelector(".location-btn");
-var contHistEl = $('.cityHist');
+//let contHistEl = document.querySelector('.cityHist');
 
 function getWeather(citiName,latitude,longtitude)
 {
@@ -108,42 +108,23 @@ function getCitylocation()
          //    console.log("Name: "+ name);
          //  console.log("Lat: "+lat);
          //   console.log("Long: "+lon);
-           cityList.push(name);
 
+         const data_object = {
+          cityName: name,
+          latitude: lat,
+          longtitude: lon
+          }; 
+           cityList.push(data_object);
        
-        
-          localStorage.setItem('name', JSON.stringify(cityList));
+          localStorage.setItem(name, JSON.stringify(cityList));
+
 
            getWeather(cityName,lat,lon);
            getForecast(lat,lon);
-           
+           getHistory(cityName);
 
-
-           contHistEl.empty();
-
-           for (let i = 0; i < cityList.length; i++) {
+          
          
-             var rowEl = $('<row>');
-             var btnEl = $('<button>').text(`${cityList[i]}`)
-             
-         
-             rowEl.addClass('row histBtnRow');
-             btnEl.addClass('btn btn-outline-secondary histBtn');
-             btnEl.attr('type', 'button');
-         
-             contHistEl.prepend(rowEl);
-             rowEl.append(btnEl);
-             
-            
-             $('.histBtn').on("click", function (event) {
-               event.preventDefault();
-               cityName = $(this).text();
-               console.log(cityName+"-----------");
-         
-             });
-            
-           
-         }
 
         })
         .catch(()=>
@@ -154,6 +135,7 @@ function getCitylocation()
      
 
 }
+
 
 
 const displayTime = function()
@@ -188,33 +170,66 @@ const getUserCoordinates = () => {
 }
 
 
+var contHistEl = $('.cityHist');
+function getHistory(citiName) {
+	//contHistEl.empty();
 
-function getHistory() {
-	contHistEl.empty();
 
-	for (let i = 0; i < cityList.length; i++) {
 
-		var rowEl = $('<row>');
-		var btnEl = $('<button>').text(`${cityList[i]}`)
-    
+    var x = document.createElement("BUTTON");
 
-		rowEl.addClass('row histBtnRow');
-		btnEl.addClass('btn btn-outline-secondary histBtn');
-		btnEl.attr('type', 'button');
+      var t = document.createTextNode(citiName);
+      x.setAttribute("class","histBtn");
+      x.appendChild(t);
+      contHistEl.appendChild(x);
 
-		contHistEl.prepend(rowEl);
-		rowEl.append(btnEl);
-    
+  
+      
+
+     
+//Allows the buttons to start a search as well
+$('.histBtn').on("click", function (event) {
+  event.preventDefault();
+  
+
+  var retrievedObject = localStorage.getItem(name);
+  
+  // CONVERT STRING TO REGULAR JS OBJECT
+  var parsedObject = JSON.parse(retrievedObject);
+  
+  // ACCESS DATA
+  console.log();
+  
    
-    $('.histBtn').on("click", function (event) {
-      event.preventDefault();
-      city = $(this).text();
-
-    });
-   
+     getWeather(cityName,parsedObject[0].latitude,parsedObject[0].longtitude);
+     getForecast(parsedObject[0].latitude,parsedObject[0].longtitude);
+});
+     
+  
+      
 	
-}
-}
 
+}
+//.cityHist
+/*
+$(":button").on("click", function (event) {
+  event.preventDefault();
+
+var retrievedObject = localStorage.getItem(name);
+
+// CONVERT STRING TO REGULAR JS OBJECT
+var parsedObject = JSON.parse(retrievedObject);
+
+// ACCESS DATA
+console.log();
+
+ 
+   getWeather(cityName,parsedObject[0].latitude,parsedObject[0].longtitude);
+   getForecast(parsedObject[0].latitude,parsedObject[0].longtitude);
+
+});
+
+*/
 searchButton.addEventListener('click',getCitylocation);
 current_Location.addEventListener('click',getUserCoordinates);
+
