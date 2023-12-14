@@ -3,21 +3,28 @@ const cityInput = document.querySelector(".city-input");
 const currentWeatherData = document.querySelector(".current-weather");
 let currentDate =  dayjs().format('MMM-DD-YYYY');
 const API_KEY ="313e19582894eb8e201b929fa986e291";
-const cityList =[];
 const weatherCardsDiv = document.querySelector(".weather-cards");
-//<button class="location-btn">Use Current Location</button>
-
-const wrapper = document.getElementById('wrapper');
-
-
-
-
+let contHistEl = $('.cityHist');
 const current_Location = document.querySelector(".location-btn");
-//let contHistEl = document.querySelector('.cityHist');
+const cityList =[];
+const butt_arr =[];
+
+
+
+var timeDisplayEl = $('#time-display');
+
+function displayTimeDashBoard()
+{
+var rightNow = dayjs().format('MMM DD, YYYY [at] hh:mm:ss a');
+timeDisplayEl.text(rightNow);
+setInterval(displayTimeDashBoard,1000);
+}
+displayTimeDashBoard();
+
 
 function getWeather(citiName,latitude,longtitude)
 {
-   var time = displayTime();
+ 
   
     const WEATHER_URL = `https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longtitude}&appid=${API_KEY}`;
     fetch(WEATHER_URL)
@@ -37,7 +44,7 @@ function getWeather(citiName,latitude,longtitude)
         $('.3').text(data.wind.speed);
         $('.4').text(data.main.humidity);
         $('img').attr('src',`https://openweathermap.org/img/wn/${data.weather[0].icon}@4x.png`);
-        $('.weather-icon h4').text(data.weather[0].description);
+        $('.weather-icon h4').text(data.weather[0].description.toUpperCase());
         
     })
 }
@@ -70,8 +77,6 @@ function getForecast(lat1,lon1)
        
        }
      
-     
-
        for (let index = 0; index < fiveDay_forecast.length; index++) {
        $('.card'+index+' h3').text(foreCastDataList[index].dt_txt.split(" ")[0]);
        var url_icon = "https://openweathermap.org/img/wn/"+foreCastDataList[index].weather[0].icon+"@2x.png";
@@ -85,10 +90,6 @@ function getForecast(lat1,lon1)
      }
   })
 }
-
-
-
-
 
 
 function getCitylocation()
@@ -119,36 +120,26 @@ function getCitylocation()
           latitude: lat,
           longtitude: lon
           }; 
-           cityList.push(data_object);
-
-   
-
-       
-          localStorage.setItem('city', JSON.stringify(cityList));
-
-
-         // var retrievedObject = localStorage.getItem(name);
-           // CONVERT STRING TO REGULAR JS OBJECT
-          // var parsedObject = JSON.parse(retrievedObject);
-          
-           // ACCESS DATA
-       //    console.log(parsedObject);
-           
-            
-             // getWeather(citiName,parsedObject[0].latitude,parsedObject[0].longtitude);
-             // getForecast(parsedObject[0].latitude,parsedObject[0].longtitude);
- 
          
 
+           if(!butt_arr.includes(cityName))
+           {
+            butt_arr.push(cityName);
+            cityList.push(data_object);
+           }
+        
+           for (let index = 0; index < butt_arr.length; index++) {
+            console.log(butt_arr[index]+"----");
+            
+           }
+        
+           console.log(butt_arr.length+"----");
+       
+          localStorage.setItem('city', JSON.stringify(cityList));
+          console.log(cityList.length+" length");
            getWeather(cityName,lat,lon);
            getForecast(lat,lon);
            getHistory();
-
-
-
-
-       
-         
 
         })
         .catch(()=>
@@ -159,32 +150,8 @@ function getCitylocation()
      
 
 }
-/*
- 
-            var retrievedObject = localStorage.getItem(name);
-          
-          // CONVERT STRING TO REGULAR JS OBJECT
-          var parsedObject = JSON.parse(retrievedObject);
-          
-          // ACCESS DATA
-          console.log(parsedObject[0].latitude+" "+parsedObject[0].longtitude);
-          
-           
-            // getWeather(citiName,parsedObject[0].latitude,parsedObject[0].longtitude);
-            // getForecast(parsedObject[0].latitude,parsedObject[0].longtitude);
-       
-          
-*/
 
 
-
-const displayTime = function()
-{
-var rightNow = dayjs().format('MMM DD, YYYY');
-
-//setInterval(displayTime,1000);
-console.log(rightNow);
-}
 
 const getUserCoordinates = () => {
   navigator.geolocation.getCurrentPosition(
@@ -209,29 +176,28 @@ const getUserCoordinates = () => {
       });
 }
 
+ 
 
 
-
-
-var contHistEl = $('.cityHist');
 function getHistory() {
-
 
   contHistEl.empty();
   for (let i = 0; i < cityList.length; i++) {
-   
-		var rowEl = $('<row>');
+  
 		var btnEl = $('<button>').text(`${cityList[i].cityName}`)
-
-		rowEl.addClass('row histBtnRow');
+	
 		btnEl.addClass('btn btn-outline-secondary histBtn');
     btnEl.attr('id',i);
 		btnEl.attr('type', 'button');
 
-		contHistEl.prepend(rowEl);
-		rowEl.append(btnEl);
+		contHistEl.append(btnEl);
+
+
+    
 
   }
+
+
 
   var retrievedObject = localStorage.getItem('city');
           
@@ -253,25 +219,7 @@ function getHistory() {
 }
 
 
-//.cityHist
-/*
-$(":button").on("click", function (event) {
-  event.preventDefault();
 
-var retrievedObject = localStorage.getItem(name);
-
-// CONVERT STRING TO REGULAR JS OBJECT
-var parsedObject = JSON.parse(retrievedObject);
-
-// ACCESS DATA
-console.log();
-
- 
-   
-
-});
-
-*/
 
 
 searchButton.addEventListener('click',getCitylocation);
